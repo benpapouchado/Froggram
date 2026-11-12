@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 public class Photo {
 
     @Id
-    @Column(name = "photo_id", columnDefinition = "serial")
+    @Column(name = "photo_id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID photoId;
 

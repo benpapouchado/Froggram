@@ -12,11 +12,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     @Id
-    @Column(name = "user_id", columnDefinition = "serial")
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
 
@@ -48,6 +48,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.bio = bio;
         this.dateOfBirth = dateOfBirth;
+        this.createdAt = createdAt;
     }
 
     public User(String username, String passwordHash,
@@ -56,6 +57,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.bio = bio;
         this.dateOfBirth = dateOfBirth;
+        this.createdAt = createdAt;
     }
 
     public UUID getUserId() {
@@ -107,14 +109,6 @@ public class User {
     }
 }
 
-// curl -X POST "http://localhost:8080/api/user/create" -H 'Content-Type: application/json' -d '{"username": "benpapouchado", "password_hash": "birb", "bio" : "dump him", "date_of_birth" : "1994-05-27"}'
+// curl -X POST "http://localhost:8080/api/user/create" -H 'Content-Type: application/json' -d '{"username": "benpapouchado", "passwordHash": "birb", "bio" : "dump him", "dateOfBirth" : "1994-05-27"}'
 
-// SELECT
-//     column_name,
-//     data_type,
-//     is_nullable,
-//     column_default
-// FROM information_schema.columns
-// WHERE table_name = 'photo'
-// AND table_schema = 'public'
-// ORDER BY ordinal_position;
+// curl -X GET "http://localhost:8080/api/user/hello" 

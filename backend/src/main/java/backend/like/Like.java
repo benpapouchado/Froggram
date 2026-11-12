@@ -9,15 +9,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "like")
+@Table(name = "post_likes")
 public class Like {
 
     @Id
-    @Column(name = "like_id", columnDefinition = "serial")
+    @Column(name = "like_id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID likeId;
 
