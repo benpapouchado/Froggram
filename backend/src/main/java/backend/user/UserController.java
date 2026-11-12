@@ -1,7 +1,7 @@
 package backend.user;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -10,19 +10,11 @@ import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import backend.validation.Validation;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -46,15 +38,9 @@ public class UserController {
         this.repository = repository;
     }
 
-        @PostMapping("/create")
+    @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Task> createAccount(@Valid @RequestBody CreateAccountRequest request) {
-
-        // Validation.isValidTitle(request.title().trim());
-        // Validation.isValidDescription(request.description().trim());
-        // Validation.isValidStatus(request.status().trim());
-        // Validation.isValidDueDate(request.dueDate());
-        // Validation.isFutureDate(request.dueDate());
+    public ResponseEntity<User> createAccount(@Valid @RequestBody CreateAccountRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(new User(
                 request.username().trim(),

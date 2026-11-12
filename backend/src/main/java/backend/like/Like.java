@@ -1,4 +1,4 @@
-package backend.user;
+package backend.like;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
@@ -30,7 +30,7 @@ public class Like {
     @Column(name = "liked_at")
     private LocalDateTime likedAt;
 
-    private Comment(UUID likeId, UUID likedBy,
+    public Like(UUID likeId, UUID likedBy,
             UUID postId, LocalDateTime likedAt) {
         this.likeId = likeId;
         this.likedBy = likedBy;

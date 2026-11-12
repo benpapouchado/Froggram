@@ -1,4 +1,4 @@
-package backend.user;
+package backend.follow;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ public class Follow {
     @Column(name = "followee_id")
     private UUID followeeId;
 
-    private Comment(UUID followerId, UUID followeeId) {
+    private Follow(UUID followerId, UUID followeeId) {
         this.followerId = followerId;
         this.followeeId = followeeId;
     }

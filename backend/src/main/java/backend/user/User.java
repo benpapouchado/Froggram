@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,9 +22,9 @@ public class User {
 
     // @ManyToMany(cascade = { CascadeType.ALL })
     // @JoinTable(
-    //         name = "track",
-    //         joinColumns = { @JoinColumn(name = "recording_id") },
-    //         inverseJoinColumns = { @JoinColumn(name = "release_id") })    
+    // name = "track",
+    // joinColumns = { @JoinColumn(name = "recording_id") },
+    // inverseJoinColumns = { @JoinColumn(name = "release_id") })
 
     @Column(name = "username", length = 20, nullable = false)
     private String username;
@@ -42,9 +41,17 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    private User(UUID userId, String username, String passwordHash,
+    public User(UUID userId, String username, String passwordHash,
             String bio, LocalDate dateOfBirth, LocalDateTime createdAt) {
         this.userId = userId;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.bio = bio;
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public User(String username, String passwordHash,
+            String bio, LocalDate dateOfBirth, LocalDateTime createdAt) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.bio = bio;
@@ -99,3 +106,15 @@ public class User {
         this.createdAt = createdAt;
     }
 }
+
+// curl -X POST "http://localhost:8080/api/user/create" -H 'Content-Type: application/json' -d '{"username": "benpapouchado", "password_hash": "birb", "bio" : "dump him", "date_of_birth" : "1994-05-27"}'
+
+// SELECT
+//     column_name,
+//     data_type,
+//     is_nullable,
+//     column_default
+// FROM information_schema.columns
+// WHERE table_name = 'photo'
+// AND table_schema = 'public'
+// ORDER BY ordinal_position;

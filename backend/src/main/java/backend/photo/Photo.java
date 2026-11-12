@@ -1,4 +1,4 @@
-package backend.user;
+package backend.photo;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
@@ -32,7 +32,6 @@ public class Photo {
     @Column(name = "likeCount")
     private int likeCount;
 
-    @ManyToOne
     @Column(name = "posted_by")
     private UUID postedBy;
 

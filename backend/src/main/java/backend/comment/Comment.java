@@ -1,4 +1,4 @@
-package backend.user;
+package backend.comment;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
