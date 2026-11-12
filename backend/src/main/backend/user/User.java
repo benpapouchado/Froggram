@@ -21,11 +21,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "track",
-            joinColumns = { @JoinColumn(name = "recording_id") },
-            inverseJoinColumns = { @JoinColumn(name = "release_id") })    
+    // @ManyToMany(cascade = { CascadeType.ALL })
+    // @JoinTable(
+    //         name = "track",
+    //         joinColumns = { @JoinColumn(name = "recording_id") },
+    //         inverseJoinColumns = { @JoinColumn(name = "release_id") })    
 
     @Column(name = "username", length = 20, nullable = false)
     private String username;
@@ -51,4 +51,51 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
