@@ -1,27 +1,36 @@
 package backend.user.auth;
 
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "auth")
 public class Auth {
-    private String username;
-    private String password;
 
-    public Auth(String username, String password) {
-        this.username = username;
-        this.password = password;
+    @Id
+    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID userId;
+
+    @Column(name = "token")
+    private String token;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
+
+    public Auth() {
+
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

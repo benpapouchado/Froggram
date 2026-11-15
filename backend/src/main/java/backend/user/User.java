@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +40,7 @@ public class User {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -59,6 +62,8 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.createdAt = createdAt;
     }
+
+    public User(){}
 
     public UUID getUserId() {
         return userId;
@@ -108,7 +113,3 @@ public class User {
         this.createdAt = createdAt;
     }
 }
-
-// curl -X POST "http://localhost:8080/api/user/create" -H 'Content-Type: application/json' -d '{"username": "benpapouchado", "passwordHash": "birb", "bio" : "dump him", "dateOfBirth" : "1994-05-27"}'
-
-// curl -X GET "http://localhost:8080/api/user/hello" 
