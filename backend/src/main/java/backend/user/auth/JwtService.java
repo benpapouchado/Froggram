@@ -16,6 +16,7 @@ public class JwtService {
 
     private final SecretKey secretKey;
     private final long expiration;
+    private static final String ISSUER = "froggram";
 
     public JwtService(
         @Value("${jwt.secret}") String secret,
@@ -27,16 +28,17 @@ public class JwtService {
         this.expiration = expiration;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String userId) {
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
-            .subject(username)
+            .subject(userId)
             .issuedAt(now)
             .expiration(expiry)
             .signWith(secretKey)
+            .issuer(ISSUER)
             .compact();
     }
 

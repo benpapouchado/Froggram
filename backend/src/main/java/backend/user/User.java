@@ -28,7 +28,7 @@ public class User {
     // joinColumns = { @JoinColumn(name = "recording_id") },
     // inverseJoinColumns = { @JoinColumn(name = "release_id") })
 
-    @Column(name = "username", length = 20, nullable = false)
+    @Column(name = "username", length = 20, nullable = false, unique = true)
     private String username;
 
     @Column(name = "password_hash", nullable = false)

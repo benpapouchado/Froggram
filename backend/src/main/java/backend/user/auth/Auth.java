@@ -1,7 +1,6 @@
 package backend.user.auth;
 
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -20,8 +19,8 @@ public class Auth {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
 
-    @Column(name = "token")
-    private String token;
+    @Column(name = "token_hash")
+    private String tokenHash;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
