@@ -7,13 +7,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import backend.user.auth.JwtService;
+import backend.user.auth.*;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -23,7 +21,9 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class UserController {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
+    private final AuthRepository authRepository;
     private final JwtService jwtService;
 
     public record CreateAccountRequest(
@@ -35,15 +35,28 @@ public class UserController {
     }
 
     public record Login(
-            String username,
-            String password_hash) {
+            @NotBlank String username,
+            @NotBlank String password_hash) {
     }
 
-    public record LoginResponse(UUID userId, String username, String token) {
+    public record LoginResponse(
+            @NotBlank UUID userId,
+            @NotBlank String username,
+            @NotBlank String token) {
     }
 
-    public UserController(UserRepository repository, JwtService jwtService) {
+    public record Session(
+            @NotBlank UUID userId,
+            @NotBlank String tokenHash,
+            @NotBlank LocalDateTime createdAt,
+            @NotBlank LocalDateTime expiresAt) {
+    }
+
+    public UserController(PasswordEncoder passwordEncoder, UserRepository repository,
+            AuthRepository authRepository, JwtService jwtService) {
+        this.passwordEncoder = passwordEncoder;
         this.repository = repository;
+        this.authRepository = authRepository;
         this.jwtService = jwtService;
     }
 
@@ -52,18 +65,13 @@ public class UserController {
         return "Hello, World!";
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> createAccount(@Valid @RequestBody CreateAccountRequest request) {
-        
+
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(new User(
                 request.username().trim(),
-                passwordEncoder().encode(request.password_hash().trim()),
+                passwordEncoder.encode(request.password_hash().trim()),
                 request.bio().trim(),
                 request.dateOfBirth(),
                 LocalDateTime.now())));
@@ -76,12 +84,19 @@ public class UserController {
 
         for (User user : users) {
             if (user.getUsername().equals(creds.username()) &&
-                    passwordEncoder().encode(creds.password_hash()).matches(user.getPasswordHash())) {
+                    passwordEncoder.matches(creds.password_hash(), user.getPasswordHash())) {
+                String token = jwtService.generateToken(user.getUserId().toString());
+
+                authRepository.save(
+                        new Auth(user.getUserId(),
+                                passwordEncoder.encode(token),
+                                LocalDateTime.now(),
+                                LocalDateTime.now().plusHours(1)));
 
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                         new LoginResponse(user.getUserId(),
                                 user.getUsername(),
-                                jwtService.generateToken(user.getUserId().toString())));
+                                token));
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
