@@ -15,7 +15,7 @@ export default function LoginForm() {
     const password = useNativeState("");
 
     const login = async () => {
-        console.log(username.value, password.value);
+        
         try {
             const response = await fetch(`${API_URL}/api/user/login`, {
                 method: 'POST',
@@ -28,7 +28,7 @@ export default function LoginForm() {
                 }),
             });
 
-            
+            console.log(username.value, password.value);
 
             if (!response.ok) {
                 if (response.status === 401) {
@@ -42,10 +42,6 @@ export default function LoginForm() {
             const data = await response.json();
 
             console.log('Login successful:', data);
-
-            // data.userId
-            // data.username
-            // data.token
 
         } catch (error) {
             console.error('Login error:', error);
