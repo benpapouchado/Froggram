@@ -1,19 +1,23 @@
+
 package backend.user;
 
 import java.time.*;
-import java.util.*;
+import java.util.List;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import backend.user.auth.*;
-
-import org.springframework.validation.annotation.Validated;
+import backend.user.auth.Auth;
+import backend.user.auth.AuthRepository;
+import backend.user.auth.JwtService;
 
 @RestController
 @CrossOrigin(origins = { "http://localhost:8081" })
@@ -26,12 +30,23 @@ public class UserController {
     private final AuthRepository authRepository;
     private final JwtService jwtService;
 
+    public UserController(
+            PasswordEncoder passwordEncoder,
+            UserRepository repository,
+            AuthRepository authRepository,
+            JwtService jwtService) {
+
+        this.passwordEncoder = passwordEncoder;
+        this.repository = repository;
+        this.authRepository = authRepository;
+        this.jwtService = jwtService;
+    }
+
     public record CreateAccountRequest(
-            @NotBlank @Size(max = 50) String username,
+            @NotBlank @Size(max = 20) String username,
             @NotBlank String password_hash,
             @Size(max = 50) String bio,
-            LocalDate dateOfBirth,
-            LocalDateTime createdAt) {
+            @NotNull LocalDate dateOfBirth) {
     }
 
     public record Login(
@@ -40,24 +55,9 @@ public class UserController {
     }
 
     public record LoginResponse(
-            @NotBlank UUID userId,
+            @NotNull java.util.UUID userId,
             @NotBlank String username,
             @NotBlank String token) {
-    }
-
-    public record Session(
-            @NotBlank UUID userId,
-            @NotBlank String tokenHash,
-            @NotBlank LocalDateTime createdAt,
-            @NotBlank LocalDateTime expiresAt) {
-    }
-
-    public UserController(PasswordEncoder passwordEncoder, UserRepository repository,
-            AuthRepository authRepository, JwtService jwtService) {
-        this.passwordEncoder = passwordEncoder;
-        this.repository = repository;
-        this.authRepository = authRepository;
-        this.jwtService = jwtService;
     }
 
     @GetMapping("/hello")
@@ -66,39 +66,60 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> createAccount(@Valid @RequestBody CreateAccountRequest request) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(new User(
-                request.username().trim(),
-                passwordEncoder.encode(request.password_hash().trim()),
-                request.bio().trim(),
+        String username = request.username().trim();
+
+        List<User> existingUsers = repository.findByUsername(username);
+
+        if (!existingUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        User user = new User(
+                username,
+                passwordEncoder.encode(request.password_hash()),
+                request.bio() == null ? null : request.bio().trim(),
                 request.dateOfBirth(),
-                LocalDateTime.now())));
+                LocalDateTime.now());
+
+        User savedUser = repository.save(user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody Login creds) {
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody Login creds) {
 
-        List<User> users = repository.findByUsername(creds.username());
+        List<User> users = repository.findByUsername(
+                creds.username().trim());
 
         for (User user : users) {
-            if (user.getUsername().equals(creds.username()) &&
-                    passwordEncoder.matches(creds.password_hash(), user.getPasswordHash())) {
+
+            if (passwordEncoder.matches(creds.password_hash(), user.getPasswordHash())) {
+
                 String token = jwtService.generateToken(user.getUserId().toString());
 
-                authRepository.save(
-                        new Auth(user.getUserId(),
-                                passwordEncoder.encode(token),
-                                LocalDateTime.now(),
-                                LocalDateTime.now().plusHours(1)));
+                LocalDateTime now = LocalDateTime.now();
 
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                        new LoginResponse(user.getUserId(),
+                Auth auth = new Auth(
+                        user.getUserId(),
+                        jwtService.hashToken(token),
+                        now,
+                        now.plusHours(1));
+
+                authRepository.save(auth);
+
+                return ResponseEntity
+                        .status(HttpStatus.ACCEPTED)
+                        .body(new LoginResponse(
+                                user.getUserId(),
                                 user.getUsername(),
                                 token));
             }
         }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
