@@ -54,9 +54,13 @@ public class UserController {
             @NotBlank String password_hash) {
     }
 
-    public record LoginResponse(
+    public record UserResponse(
             @NotNull java.util.UUID userId,
-            @NotBlank String username,
+            @NotBlank String username) {
+    }
+
+    public record LoginResponse(
+            @NotBlank UserResponse user,
             @NotBlank String token) {
     }
 
@@ -114,8 +118,9 @@ public class UserController {
                 return ResponseEntity
                         .status(HttpStatus.ACCEPTED)
                         .body(new LoginResponse(
-                                user.getUserId(),
-                                user.getUsername(),
+                                new UserResponse(
+                                        user.getUserId(),
+                                        user.getUsername()),
                                 token));
             }
         }

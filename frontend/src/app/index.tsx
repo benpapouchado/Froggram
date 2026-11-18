@@ -18,35 +18,12 @@ export default function HomeScreen() {
 
   const API_URL = "http://172.20.10.2:8080";
 
-
-  const testConnection = async () => {
-    try {
-      const response = await fetch(
-        `${API_URL}/api/user/hello`
-      );
-
-      const text = await response.text();
-
-      console.log("Status:", response.status);
-      console.log("Response:", text);
-
-    } catch (error) {
-      console.error("Connection failed:", error);
-    }
-  };
-
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
 
-        <Button
-          title={"Submit"}
-          onPress={testConnection} />
-
-
         <ThemedView style={styles.heroSection}>
           
-          {/* <AnimatedIcon /> */}
           <ThemedText type="title" style={styles.title}>
             Froggram
           </ThemedText>
