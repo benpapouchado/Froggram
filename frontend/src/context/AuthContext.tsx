@@ -9,6 +9,8 @@ import React, {
 
 import * as SecureStore from "expo-secure-store";
 
+import { authenticate } from "@/auth/sign-in-service";
+
 // User interface
 export interface User {
     id: string;
@@ -39,6 +41,8 @@ const AuthContext = createContext<AuthContextType | undefined>(
 // Provider
 interface AuthProviderProps { children: ReactNode; }
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 export const AuthProvider = ({ children, }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
@@ -65,29 +69,8 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
         restoreSession();
     }, []);
 
-    // Login
-    const login = async (
-        email: string,
-        password: string
-    ): Promise<void> => {
-        const response = await fetch(
-            "https://your-api.com/api/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            }
-        );
-
-        const data = await response.json() as LoginResponse;
-
-        if (!response.ok) {
-            throw new Error(
-                (data as any).message || "Login failed"
-            );
-        }
+    const login = async (username: string, password: string) => {
+        const data = await authenticate(username, password);
 
         await SecureStore.setItemAsync("token", data.token);
         await SecureStore.setItemAsync(

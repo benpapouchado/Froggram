@@ -1,29 +1,32 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+
 import { Stack } from "expo-router";
-import { AuthProvider } from "./context/AuthContext";
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { AuthProvider, useAuth } from "../context/AuthContext";
+import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootNavigator() {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <AuthProvider>
-        <AppTabs />
-    </AuthProvider>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={isAuthenticated}>
+        <Stack.Screen name="loggedin" />
+        <Stack.Screen name="profile" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!isAuthenticated}>
+        <Stack.Screen name="sign-in" />
+        <Stack.Screen name="registert" />
+      </Stack.Protected>
+    </Stack>
   );
 }
 
-
-
-
-// export default function RootLayout() {
-//   return (
-//     <AuthProvider>
-//       <Stack screenOptions={{ headerShown: false }} />
-//     </AuthProvider>
-//   );
-// }
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
+  );
+}
