@@ -12,7 +12,7 @@ import * as SecureStore from "expo-secure-store";
 import { authenticate } from "@/auth/sign-in-service";
 
 export interface User {
-    id: string;
+    userId: string;
     username: string;
 }
 
@@ -69,7 +69,8 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
     const login = async (username: string, password: string) => {
         const data = await authenticate(username, password);
 
-        await SecureStore.setItemAsync("token", data.token);
+        await SecureStore.setItemAsync("refreshToken", data.refreshToken);
+        await SecureStore.setItemAsync("accessToken", data.accessToken);
         await SecureStore.setItemAsync(
             "user",
             JSON.stringify(data.user)
@@ -81,7 +82,8 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
     };
 
     const logout = async (): Promise<void> => {
-        await SecureStore.deleteItemAsync("token");
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");        
         await SecureStore.deleteItemAsync("user");
 
         setAccessToken(null);
