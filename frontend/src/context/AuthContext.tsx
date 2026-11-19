@@ -33,22 +33,17 @@ interface AuthContextType {
     logout: () => Promise<void>;
 }
 
-// Context
 const AuthContext = createContext<AuthContextType | undefined>(
     undefined
 );
 
-// Provider
 interface AuthProviderProps { children: ReactNode; }
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const AuthProvider = ({ children, }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
-    // Restore session
     useEffect(() => {
         const restoreSession = async () => {
             try {
@@ -82,7 +77,6 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
         setUser(data.user);
     };
 
-    // Logout
     const logout = async (): Promise<void> => {
         await SecureStore.deleteItemAsync("token");
         await SecureStore.deleteItemAsync("user");

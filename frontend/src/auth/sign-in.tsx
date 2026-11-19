@@ -1,14 +1,17 @@
 
-import { Column, Host } from "@expo/ui";
 import { useState } from "react";
-import { TextInput, Button, Text, StyleSheet } from "react-native";
+import {
+    View,
+    TextInput,
+    Button,
+    Text,
+    StyleSheet,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
-function LoginForm() {
+export function LoginForm() {
     const { login } = useAuth();
-
-    const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -21,45 +24,71 @@ function LoginForm() {
             setError("");
 
             await login(username, password);
-
-        } catch (error: any) {
-            setError(error.message);
+        } catch (err: any) {
+            setError(err.message || "Login failed");
         } finally {
             setLoading(false);
         }
     };
 
-    return (<SafeAreaView>
-        <Host matchContents={{ vertical: true }} style={{ width: "100%" }}>
-            <Column spacing={12}>
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={styles.form}>
+                <Text style={styles.title}>Login</Text>
+
                 <TextInput
+                    style={styles.input}
                     placeholder="Username"
                     value={username}
                     onChangeText={setUsername}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    autoComplete="username"
-                    accessibilityLabel="Username"
                 />
 
                 <TextInput
+                    style={styles.input}
                     placeholder="Password"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
-                    autoComplete="current-password"
-                    accessibilityLabel="Password"
                 />
 
-                {/* {error ? <Text style={styles.error}>{error}</Text> : null} */}
+                {error ? (
+                    <Text style={styles.error}>{error}</Text>
+                ) : null}
 
                 <Button
                     title={loading ? "Logging in..." : "Login"}
                     onPress={handleLogin}
-                    disabled={loading}
+                    // disabled={loading}
                 />
-            </Column>
-        </Host>
-    </SafeAreaView>
+            </View>
+        </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        paddingHorizontal: 20,
+    },
+    form: {
+        gap: 15,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 10,
+        padding: 14,
+        fontSize: 16,
+    },
+    error: {
+        color: "red",
+    },
+});
