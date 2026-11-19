@@ -39,7 +39,7 @@ export function LoginForm() {
                 <TextInput
                     style={styles.input}
                     placeholder="Username"
-                    value={username}
+                    value={username.trim()}
                     onChangeText={setUsername}
                     autoCapitalize="none"
                     autoCorrect={false}
@@ -48,7 +48,7 @@ export function LoginForm() {
                 <TextInput
                     style={styles.input}
                     placeholder="Password"
-                    value={password}
+                    value={password.trim()}
                     onChangeText={setPassword}
                     secureTextEntry
                 />
