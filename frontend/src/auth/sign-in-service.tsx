@@ -19,3 +19,22 @@ export async function authenticate(username: string, password: string) {
 
     return data;
 }
+
+export async function revokeRefreshToken(username: string) {
+    const response = await fetch(`${API_URL}/api/user/logout`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+            username: username}),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || "Logout failed");
+    }
+
+    return data;
+}

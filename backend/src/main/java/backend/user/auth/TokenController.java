@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/jwt")
-public class JwtController {
+@RequestMapping("/token")
+public class TokenController {
 
     private final JwtService jwtService;
 
-    public JwtController(JwtService jwtService) {
+    public TokenController(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
@@ -19,7 +19,7 @@ public class JwtController {
     public Map<String, String> generateToken(
             @RequestParam String username) {
 
-        String token = jwtService.generateToken(username);
+        String token = jwtService.createAccessToken(username);
 
         return Map.of("token", token);
     }

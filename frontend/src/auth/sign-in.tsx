@@ -60,7 +60,7 @@ export function LoginForm() {
                 <Button
                     title={loading ? "Logging in..." : "Login"}
                     onPress={handleLogin}
-                    // disabled={loading}
+                    disabled={loading}
                 />
             </View>
         </SafeAreaView>

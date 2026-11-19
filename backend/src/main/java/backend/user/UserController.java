@@ -15,9 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import backend.user.auth.Auth;
-import backend.user.auth.AuthRepository;
-import backend.user.auth.JwtService;
+import backend.user.UserController.CreateAccountRequest;
+import backend.user.UserController.Login;
+import backend.user.UserController.LoginResponse;
+import backend.user.UserController.UserResponse;
+import backend.user.auth.*;
 
 @RestController
 @CrossOrigin(origins = { "http://localhost:8081" })
@@ -27,18 +29,24 @@ public class UserController {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
-    private final AuthRepository authRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
+    private final TokenHash tokenHash;
     private final JwtService jwtService;
 
     public UserController(
             PasswordEncoder passwordEncoder,
             UserRepository repository,
-            AuthRepository authRepository,
+            RefreshTokenRepository refreshTokenRepository,
+            RefreshTokenService refreshTokenService,
+            TokenHash tokenHash,
             JwtService jwtService) {
 
         this.passwordEncoder = passwordEncoder;
         this.repository = repository;
-        this.authRepository = authRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.refreshTokenService = refreshTokenService;
+        this.tokenHash = tokenHash;
         this.jwtService = jwtService;
     }
 
@@ -61,7 +69,8 @@ public class UserController {
 
     public record LoginResponse(
             @NotBlank UserResponse user,
-            @NotBlank String token) {
+            @NotBlank String accessToken,
+            @NotBlank String refreshToken) {
     }
 
     @GetMapping("/hello")
@@ -103,17 +112,8 @@ public class UserController {
 
             if (passwordEncoder.matches(creds.password_hash(), user.getPasswordHash())) {
 
-                String token = jwtService.generateToken(user.getUserId().toString());
-
-                LocalDateTime now = LocalDateTime.now();
-
-                Auth auth = new Auth(
-                        user.getUserId(),
-                        jwtService.hashToken(token),
-                        now,
-                        now.plusHours(1));
-
-                authRepository.save(auth);
+                String accessToken = jwtService.createAccessToken(user.getUserId().toString());
+                String refreshToken = refreshTokenService.createRefreshToken(user.getUserId());
 
                 return ResponseEntity
                         .status(HttpStatus.ACCEPTED)
@@ -121,7 +121,7 @@ public class UserController {
                                 new UserResponse(
                                         user.getUserId(),
                                         user.getUsername()),
-                                token));
+                                accessToken, refreshToken));
             }
         }
 

@@ -11,22 +11,21 @@ import * as SecureStore from "expo-secure-store";
 
 import { authenticate } from "@/auth/sign-in-service";
 
-// User interface
 export interface User {
     id: string;
     username: string;
 }
 
-// Login response interface
 interface LoginResponse {
-    token: string;
     user: User;
+    accessToken: string;
+    refreshToken: string;
 }
 
-// Auth context interface
 interface AuthContextType {
     user: User | null;
-    token: string | null;
+    accessToken: string | null;
+    refreshToken: string | null;
     loading: boolean;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
@@ -41,17 +40,20 @@ interface AuthProviderProps { children: ReactNode; }
 
 export const AuthProvider = ({ children, }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [refreshToken, setRefreshToken] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const restoreSession = async () => {
             try {
-                const savedToken = await SecureStore.getItemAsync("token");
+                const savedAccessToken = await SecureStore.getItemAsync("accessToken");
+                const savedRefreshToken = await SecureStore.getItemAsync("refreshToken");
                 const savedUser = await SecureStore.getItemAsync("user");
 
-                if (savedToken && savedUser) {
-                    setToken(savedToken);
+                if (savedAccessToken && savedRefreshToken && savedUser) {
+                    setAccessToken(savedAccessToken);
+                    setRefreshToken(savedRefreshToken);
                     setUser(JSON.parse(savedUser) as User);
                 }
             } catch (error) {
@@ -73,7 +75,8 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
             JSON.stringify(data.user)
         );
 
-        setToken(data.token);
+        setAccessToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
         setUser(data.user);
     };
 
@@ -81,17 +84,19 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
         await SecureStore.deleteItemAsync("token");
         await SecureStore.deleteItemAsync("user");
 
-        setToken(null);
+        setAccessToken(null);
+        setRefreshToken(null);
         setUser(null);
     };
 
-    const isAuthenticated = !!token && !!user;
+    const isAuthenticated = !!accessToken && !!refreshToken && !!user;
 
     return (
         <AuthContext.Provider
             value={{
                 user,
-                token,
+                accessToken,
+                refreshToken,
                 loading,
                 isAuthenticated,
                 login,

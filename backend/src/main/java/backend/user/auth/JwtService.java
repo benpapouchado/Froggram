@@ -29,7 +29,7 @@ public class JwtService {
         this.expiration = expiration;
     }
 
-    public String generateToken(String userId) {
+    public String createAccessToken(String userId) {
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration);
