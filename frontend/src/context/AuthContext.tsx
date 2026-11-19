@@ -103,7 +103,6 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
     );
 };
 
-// Custom hook
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
 
