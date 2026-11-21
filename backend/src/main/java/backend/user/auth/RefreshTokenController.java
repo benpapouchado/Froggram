@@ -42,6 +42,10 @@ public class RefreshTokenController {
     public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenDto entity) {
         Optional<RefreshToken> oldToken = refreshTokenRepository.findOldToken(entity.refreshToken);
 
+        if(!tokenHash.hashToken(entity.refreshToken).equals(oldToken.orElseThrow().getTokenHash())){
+            throw new IllegalArgumentException("Different token");
+        }
+
         String[] rotateRefreshtoken = refreshTokenService.refreshToken(
             oldToken.orElseThrow().getId(),
             LocalDateTime.now(),
