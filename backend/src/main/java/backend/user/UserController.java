@@ -15,10 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import backend.user.UserController.CreateAccountRequest;
-import backend.user.UserController.Login;
-import backend.user.UserController.LoginResponse;
-import backend.user.UserController.UserResponse;
 import backend.user.auth.*;
 
 @RestController
@@ -27,104 +23,98 @@ import backend.user.auth.*;
 @Validated
 public class UserController {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository repository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final RefreshTokenService refreshTokenService;
-    private final TokenHash tokenHash;
-    private final JwtService jwtService;
+        private final PasswordEncoder passwordEncoder;
+        private final UserRepository repository;
+        private final RefreshTokenService refreshTokenService;
+        private final JwtService jwtService;
 
-    public UserController(
-            PasswordEncoder passwordEncoder,
-            UserRepository repository,
-            RefreshTokenRepository refreshTokenRepository,
-            RefreshTokenService refreshTokenService,
-            TokenHash tokenHash,
-            JwtService jwtService) {
+        public UserController(
+                        PasswordEncoder passwordEncoder,
+                        UserRepository repository,
+                        RefreshTokenService refreshTokenService,
+                        JwtService jwtService) {
 
-        this.passwordEncoder = passwordEncoder;
-        this.repository = repository;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.refreshTokenService = refreshTokenService;
-        this.tokenHash = tokenHash;
-        this.jwtService = jwtService;
-    }
-
-    public record CreateAccountRequest(
-            @NotBlank @Size(max = 20) String username,
-            @NotBlank String password_hash,
-            @Size(max = 50) String bio,
-            @NotNull LocalDate dateOfBirth) {
-    }
-
-    public record Login(
-            @NotBlank String username,
-            @NotBlank String password_hash) {
-    }
-
-    public record UserResponse(
-            @NotNull java.util.UUID userId,
-            @NotBlank String username) {
-    }
-
-    public record LoginResponse(
-            @NotBlank UserResponse user,
-            @NotBlank String accessToken,
-            @NotBlank String refreshToken) {
-    }
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello, World!";
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<User> createAccount(@Valid @RequestBody CreateAccountRequest request) {
-
-        String username = request.username().trim();
-
-        List<User> existingUsers = repository.findByUsername(username);
-
-        if (!existingUsers.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                this.passwordEncoder = passwordEncoder;
+                this.repository = repository;
+                this.refreshTokenService = refreshTokenService;
+                this.jwtService = jwtService;
         }
 
-        User user = new User(
-                username,
-                passwordEncoder.encode(request.password_hash()),
-                request.bio() == null ? null : request.bio().trim(),
-                request.dateOfBirth(),
-                LocalDateTime.now());
-
-        User savedUser = repository.save(user);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody Login creds) {
-
-        List<User> users = repository.findByUsername(
-                creds.username().trim());
-
-        for (User user : users) {
-
-            if (passwordEncoder.matches(creds.password_hash(), user.getPasswordHash())) {
-
-                String accessToken = jwtService.createAccessToken(user.getUserId().toString());
-                String refreshToken = refreshTokenService.createRefreshToken(user.getUserId());
-
-                return ResponseEntity
-                        .status(HttpStatus.ACCEPTED)
-                        .body(new LoginResponse(
-                                new UserResponse(
-                                        user.getUserId(),
-                                        user.getUsername()),
-                                accessToken, refreshToken));
-            }
+        public record CreateAccountRequest(
+                        @NotBlank @Size(max = 20) String username,
+                        @NotBlank String password_hash,
+                        @Size(max = 50) String bio,
+                        @NotNull LocalDate dateOfBirth) {
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
+        public record Login(
+                        @NotBlank String username,
+                        @NotBlank String password_hash) {
+        }
+
+        public record UserResponse(
+                        @NotNull java.util.UUID userId,
+                        @NotBlank String username) {
+        }
+
+        public record LoginResponse(
+                        @NotBlank UserResponse user,
+                        @NotBlank String accessToken,
+                        @NotBlank String refreshToken) {
+        }
+
+        @GetMapping("/hello")
+        public String hello() {
+                return "Hello, World!";
+        }
+
+        @PostMapping("/create")
+        public ResponseEntity<User> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+
+                String username = request.username().trim();
+
+                List<User> existingUsers = repository.findByUsername(username);
+
+                if (!existingUsers.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                }
+
+                User user = new User(
+                                username,
+                                passwordEncoder.encode(request.password_hash()),
+                                request.bio() == null ? null : request.bio().trim(),
+                                request.dateOfBirth(),
+                                LocalDateTime.now());
+
+                User savedUser = repository.save(user);
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        }
+
+        @PostMapping("/login")
+        public ResponseEntity<LoginResponse> login(
+                        @Valid @RequestBody Login creds) {
+
+                List<User> users = repository.findByUsername(
+                                creds.username().trim());
+
+                for (User user : users) {
+
+                        if (passwordEncoder.matches(creds.password_hash(), user.getPasswordHash())) {
+
+                                String accessToken = jwtService.createAccessToken(user.getUserId().toString());
+                                String refreshToken = refreshTokenService.createRefreshTokenOnLogin(user.getUserId());
+
+                                return ResponseEntity
+                                                .status(HttpStatus.ACCEPTED)
+                                                .body(new LoginResponse(
+                                                                new UserResponse(
+                                                                                user.getUserId(),
+                                                                                user.getUsername()),
+                                                                accessToken, refreshToken));
+                        }
+                }
+
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 }

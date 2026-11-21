@@ -43,21 +43,6 @@ public class JwtService {
             .compact();
     }
 
-    public String hashToken(String token) {
-    try {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-        byte[] hash = digest.digest(
-            token.getBytes(java.nio.charset.StandardCharsets.UTF_8)
-        );
-
-        return HexFormat.of().formatHex(hash);
-
-    } catch (NoSuchAlgorithmException e) {
-        throw new IllegalStateException(e);
-    }
-}
-
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
     }

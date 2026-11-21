@@ -42,13 +42,26 @@ public class RefreshToken {
             String tokenHash,
             UUID tokenFamilyId,
             LocalDateTime createdAt,
-            LocalDateTime expiresAt) {
+            LocalDateTime expiresAt,
+            Long replacedBy) {
 
         this.userId = userId;
         this.tokenHash = tokenHash;
         this.tokenFamilyId = tokenFamilyId;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
+        this.replacedBy = replacedBy;
+    }
+
+    public RefreshToken(
+            Long id,
+            UUID userId,
+            String tokenHash,
+            UUID tokenFamilyId) {
+        this.id = id;
+        this.userId = userId;
+        this.tokenHash = tokenHash;
+        this.tokenFamilyId = tokenFamilyId;
     }
 
     public Long getId() {

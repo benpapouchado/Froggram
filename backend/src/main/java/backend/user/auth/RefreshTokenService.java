@@ -4,16 +4,27 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import backend.user.auth.RefreshTokenController.RefreshTokenDto;
+import backend.user.auth.RefreshTokenController.RefreshTokenResponse;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
+import org.springframework.http.ResponseEntity;
 
 @Service
 public class RefreshTokenService {
 
-    @Value("${refresh.expiration}")long expiration;
+    @Value("${refresh.expiration}")
+    long expiration;
+    private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenHash tokenHash;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, TokenHash tokenHash) {
+    public RefreshTokenService(JwtService jwtService, RefreshTokenRepository refreshTokenRepository,
+            TokenHash tokenHash) {
+        this.jwtService = jwtService;
         this.refreshTokenRepository = refreshTokenRepository;
         this.tokenHash = tokenHash;
     }
@@ -31,7 +42,7 @@ public class RefreshTokenService {
                 .encodeToString(bytes);
     }
 
-    public String createRefreshToken(UUID userId) {
+    public String createRefreshTokenOnLogin(UUID userId) {
 
         String refreshToken = generateRefreshToken();
         UUID tokenFamilyId = UUID.randomUUID();
@@ -42,9 +53,31 @@ public class RefreshTokenService {
                 tokenHash.hashToken(refreshToken),
                 tokenFamilyId,
                 now,
-                LocalDateTime.now().plusDays(expiration));
+                now.plusDays(expiration),
+                null);
         refreshTokenRepository.save(refresh);
         return refreshToken;
+    }
+
+    public String[] refreshToken(Long oldId, LocalDateTime now, UUID userId, UUID tokenFamilyId) {
+        String[] tokens = new String[2];
+        String newAccessToken = jwtService.createAccessToken(userId.toString());
+        String newRefreshToken = generateRefreshToken();
+        tokens[0] = newAccessToken;
+        tokens[1] = newRefreshToken;
+
+        RefreshToken rotateToken = new RefreshToken(
+                userId,
+                tokenHash.hashToken(newRefreshToken),
+                tokenFamilyId,
+                now,
+                now.plusDays(expiration),
+                null);
+
+        RefreshToken newToken = refreshTokenRepository.save(rotateToken);
+        refreshTokenRepository.rotaterefreshToken(oldId, newToken.getReplacedBy(), now);
+
+        return tokens;
     }
 
 }
