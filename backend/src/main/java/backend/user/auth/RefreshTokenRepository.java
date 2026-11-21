@@ -17,8 +17,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
     @Query("""
             UPDATE RefreshToken rt
-            SET rt.revoked_at = :now
-            AND rt.replaced_by = :replacedBy
+            SET rt.revoked_at = :now,
+                rt.replaced_by = :replacedBy
             WHERE rt.id = id
             """)
     Optional<RefreshToken> rotaterefreshToken(
