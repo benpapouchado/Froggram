@@ -29,7 +29,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     HttpMethod.POST,
                     "/api/user/login",
-                    "/api/user/create"
+                    "/api/user/create",
+                    "/api/token/refresh"
                 ).permitAll()
 
                 .requestMatchers(

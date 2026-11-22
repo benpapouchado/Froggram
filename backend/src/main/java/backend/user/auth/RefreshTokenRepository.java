@@ -8,21 +8,15 @@ import org.springframework.data.repository.query.Param;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByTokenHash(String tokenHash);
 
-    @Query("""
-            SELECT id, userId, token_family_id, token_hash
-            FROM RefreshToken rt
-            WHERE rt.refresh_token = :refreshToken
-            """)
-    Optional<RefreshToken> findOldToken(@Param("refresh_token") String refreshToken);
-
+    @Modifying
     @Query("""
             UPDATE RefreshToken rt
-            SET rt.revoked_at = :now,
-                rt.replaced_by = :replacedBy
+            SET rt.revokedAt = :revokedAt,
+                rt.replacedBy = :replacedBy
             WHERE rt.id = id
             """)
     Optional<RefreshToken> rotaterefreshToken(
             @Param("id") Long id,
-            @Param("replaced_by") Long replacedBy,
-            @Param("revoked_at") LocalDateTime now);
+            @Param("replacedBy") Long replacedBy,
+            @Param("revokedAt") LocalDateTime revokedAt);
 }

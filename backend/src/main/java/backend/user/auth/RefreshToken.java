@@ -53,17 +53,6 @@ public class RefreshToken {
         this.replacedBy = replacedBy;
     }
 
-    public RefreshToken(
-            Long id,
-            UUID userId,
-            String tokenHash,
-            UUID tokenFamilyId) {
-        this.id = id;
-        this.userId = userId;
-        this.tokenHash = tokenHash;
-        this.tokenFamilyId = tokenFamilyId;
-    }
-
     public Long getId() {
         return id;
     }

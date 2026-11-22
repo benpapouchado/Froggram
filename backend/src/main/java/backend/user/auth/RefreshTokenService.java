@@ -4,14 +4,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import backend.user.auth.RefreshTokenController.RefreshTokenDto;
-import backend.user.auth.RefreshTokenController.RefreshTokenResponse;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
-import org.springframework.http.ResponseEntity;
 
 @Service
 public class RefreshTokenService {
@@ -75,7 +68,7 @@ public class RefreshTokenService {
                 null);
 
         RefreshToken newToken = refreshTokenRepository.save(rotateToken);
-        refreshTokenRepository.rotaterefreshToken(oldId, newToken.getReplacedBy(), now);
+        refreshTokenRepository.rotaterefreshToken(oldId, newToken.getId(), now);
 
         return tokens;
     }

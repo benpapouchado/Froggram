@@ -5,25 +5,19 @@ import java.util.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import backend.user.auth.RefreshTokenController.RefreshTokenDto;
-import backend.user.auth.RefreshTokenController.RefreshTokenResponse;
-
 @RestController
 @RequestMapping("/token")
 public class RefreshTokenController {
 
     private final TokenHash tokenHash;
-    private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
 
     public RefreshTokenController(
             TokenHash tokenHash,
-            JwtService jwtService,
             RefreshTokenRepository refreshTokenRepository,
             RefreshTokenService refreshTokenService) {
         this.tokenHash = tokenHash;
-        this.jwtService = jwtService;
         this.refreshTokenRepository = refreshTokenRepository;
         this.refreshTokenService = refreshTokenService;
     }
@@ -40,7 +34,8 @@ public class RefreshTokenController {
 
     @PostMapping("/refresh")
     public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenDto entity) {
-        Optional<RefreshToken> oldToken = refreshTokenRepository.findOldToken(entity.refreshToken);
+        Optional<RefreshToken> oldToken = refreshTokenRepository.findByTokenHash(
+            tokenHash.hashToken(entity.refreshToken));
 
         if(!tokenHash.hashToken(entity.refreshToken).equals(oldToken.orElseThrow().getTokenHash())){
             throw new IllegalArgumentException("Different token");
@@ -62,3 +57,9 @@ public class RefreshTokenController {
     }
 
 }
+
+// curl -i -X POST http://localhost:8080/token/refresh -H "Content-Type: application/json" -d '{
+//   "refreshToken": "9fa66fc55627930f3b7cd2fa39af3c6904b4c3d8e68691c0f0781f6a136dd913",
+//   "userId": "892e701c-dd1f-46ac-9302-31582771666c"
+// }'
+
