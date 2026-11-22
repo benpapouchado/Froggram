@@ -1,7 +1,6 @@
 package backend.like;
 
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;

@@ -1,7 +1,5 @@
 package backend.photo;
 
-import java.time.LocalDateTime;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
