@@ -33,17 +33,15 @@ public class RefreshTokenController {
 
     @PostMapping("/refresh")
     public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenDto entity) {
-        String hashedToken = tokenHash.hashToken(entity.refreshToken);
         RefreshToken oldToken = refreshTokenRepository
-        .findByTokenHash(entity.refreshToken)
-        .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+                .findByTokenHash(entity.refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         String[] rotateRefreshtoken = refreshTokenService.refreshToken(
-            oldToken.getId(),
-            LocalDateTime.now(),
-            oldToken.getUserId(),
-            oldToken.getTokenFamilyId()
-        );
+                oldToken.getId(),
+                LocalDateTime.now(),
+                oldToken.getUserId(),
+                oldToken.getTokenFamilyId());
 
         String accessToken = rotateRefreshtoken[0];
         String refreshToken = rotateRefreshtoken[1];
@@ -55,6 +53,18 @@ public class RefreshTokenController {
         return ResponseEntity.ok().body(new RefreshTokenResponse(
                 refreshToken,
                 accessToken));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> revokeToken(@RequestBody String refreshToken) {
+        RefreshToken currentToken = refreshTokenRepository
+                .findByTokenHash(refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+                currentToken.setRevokedAt(LocalDateTime.now());
+                refreshTokenRepository.save(currentToken);
+
+        return ResponseEntity.ok().build();
     }
 
 }
