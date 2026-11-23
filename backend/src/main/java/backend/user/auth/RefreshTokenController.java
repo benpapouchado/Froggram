@@ -23,8 +23,7 @@ public class RefreshTokenController {
     }
 
     public record RefreshTokenDto(
-            String refreshToken,
-            String userId) {
+            String refreshToken) {
     }
 
     public record RefreshTokenResponse(
@@ -34,22 +33,24 @@ public class RefreshTokenController {
 
     @PostMapping("/refresh")
     public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenDto entity) {
-        Optional<RefreshToken> oldToken = refreshTokenRepository.findByTokenHash(
-            tokenHash.hashToken(entity.refreshToken));
-
-        if(!tokenHash.hashToken(entity.refreshToken).equals(oldToken.orElseThrow().getTokenHash())){
-            throw new IllegalArgumentException("Different token");
-        }
+        String hashedToken = tokenHash.hashToken(entity.refreshToken);
+        RefreshToken oldToken = refreshTokenRepository
+        .findByTokenHash(entity.refreshToken)
+        .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         String[] rotateRefreshtoken = refreshTokenService.refreshToken(
-            oldToken.orElseThrow().getId(),
+            oldToken.getId(),
             LocalDateTime.now(),
-            oldToken.orElseThrow().getUserId(),
-            oldToken.orElseThrow().getTokenFamilyId()
+            oldToken.getUserId(),
+            oldToken.getTokenFamilyId()
         );
 
         String accessToken = rotateRefreshtoken[0];
         String refreshToken = rotateRefreshtoken[1];
+
+        oldToken.setRevokedAt(LocalDateTime.now());
+        oldToken.setReplacedBy(Long.parseLong(rotateRefreshtoken[2]));
+        refreshTokenRepository.save(oldToken);
 
         return ResponseEntity.ok().body(new RefreshTokenResponse(
                 refreshToken,
@@ -59,7 +60,6 @@ public class RefreshTokenController {
 }
 
 // curl -i -X POST http://localhost:8080/token/refresh -H "Content-Type: application/json" -d '{
-//   "refreshToken": "9fa66fc55627930f3b7cd2fa39af3c6904b4c3d8e68691c0f0781f6a136dd913",
-//   "userId": "892e701c-dd1f-46ac-9302-31582771666c"
+//   "refreshToken": "ciUiHHniabROzOiuf8jNtqW12c9OiRg67T7TNmotrjmBzj6pDi-NGUx4Xzlyp62nTyBtzI8PvHcJ_7VVgyci5A"
 // }'
 

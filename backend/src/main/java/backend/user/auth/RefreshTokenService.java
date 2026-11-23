@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RefreshTokenService {
@@ -52,8 +53,9 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
+    @Transactional
     public String[] refreshToken(Long oldId, LocalDateTime now, UUID userId, UUID tokenFamilyId) {
-        String[] tokens = new String[2];
+        String[] tokens = new String[3];
         String newAccessToken = jwtService.createAccessToken(userId.toString());
         String newRefreshToken = generateRefreshToken();
         tokens[0] = newAccessToken;
@@ -68,9 +70,15 @@ public class RefreshTokenService {
                 null);
 
         RefreshToken newToken = refreshTokenRepository.save(rotateToken);
-        refreshTokenRepository.rotaterefreshToken(oldId, newToken.getId(), now);
+        Long replacedBy = newToken.getId();
 
+        tokens[2] = replacedBy.toString();
         return tokens;
     }
 
 }
+
+// curl -i -X POST http://localhost:8080/token/refresh -H "Content-Type:
+// application/json" -d '{
+// "refreshToken": "IamdDbQsLhXzuN8jG0P_eqSTuW_GzJ-_bkzqHRkdXKq_im4c3rJxauo4dAIhjJamrsOteAjP_qSHognrMkFF2Q"
+// }'

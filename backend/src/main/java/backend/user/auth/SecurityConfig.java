@@ -30,7 +30,7 @@ public class SecurityConfig {
                     HttpMethod.POST,
                     "/api/user/login",
                     "/api/user/create",
-                    "/api/token/refresh"
+                    "/token/refresh"
                 ).permitAll()
 
                 .requestMatchers(
