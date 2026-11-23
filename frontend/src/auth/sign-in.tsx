@@ -1,11 +1,13 @@
 
 import { useState } from "react";
+import { Stack, useRouter } from 'expo-router';
 import {
     View,
     TextInput,
     Button,
     Text,
     StyleSheet,
+    Pressable
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
@@ -17,6 +19,8 @@ export function LoginForm() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    const router = useRouter();
 
     const handleLogin = async () => {
         try {
@@ -57,11 +61,16 @@ export function LoginForm() {
                     <Text style={styles.error}>{error}</Text>
                 ) : null}
 
-                <Button
-                    title={loading ? "Logging in..." : "Login"}
-                    onPress={handleLogin}
-                    disabled={loading}
-                />
+                <Pressable onPress={handleLogin} disabled={loading}>
+                <Text>{loading ? "Logging in..." : "Login"}</Text>
+                </Pressable>
+
+                <Text>OR</Text>
+
+                <Pressable onPress={() => router.navigate('/register')}>
+                <Text>Create Account</Text>
+                </Pressable>
+
             </View>
         </SafeAreaView>
     );

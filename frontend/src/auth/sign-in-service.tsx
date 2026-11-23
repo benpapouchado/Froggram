@@ -6,9 +6,10 @@ export async function authenticate(username: string, password: string) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-            username: username, 
-            password_hash: password }),
+        body: JSON.stringify({
+            username: username,
+            password_hash: password
+        }),
     });
 
     const data = await response.json();
@@ -26,8 +27,9 @@ export async function revokeRefreshToken(refreshToken: string) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-            refreshToken: refreshToken}),
+        body: JSON.stringify({
+            refreshToken: refreshToken
+        }),
     });
 
     const data = await response.json();
@@ -39,20 +41,49 @@ export async function revokeRefreshToken(refreshToken: string) {
     return data;
 }
 
-export async function rotateToken(refreshToken : string) {
-        const response = await fetch(`${API_URL}/token/refresh`, {
+export async function rotateToken(refreshToken: string) {
+    const response = await fetch(`${API_URL}/token/refresh`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-            refreshToken: refreshToken}),
+        body: JSON.stringify({
+            refreshToken: refreshToken
+        }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
         throw new Error(data.message || "Rotation failed");
+    }
+
+    return data;
+}
+
+export async function register(
+    username: string,
+    password: string,
+    bio: string,
+    dateOfBirth: Date
+) {
+    const response = await fetch(`${API_URL}/token/refresh`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            bio: bio,
+            dateOfBirth: dateOfBirth
+        }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || "Account creation failed");
     }
 
     return data;
