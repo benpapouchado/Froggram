@@ -1,5 +1,5 @@
 
-import React, {
+import {
     createContext,
     useContext,
     useEffect,
@@ -9,7 +9,7 @@ import React, {
 
 import * as SecureStore from "expo-secure-store";
 
-import { authenticate } from "@/auth/sign-in-service";
+import { authenticate, rotateToken } from "@/auth/sign-in-service";
 
 export interface User {
     userId: string;
@@ -28,8 +28,9 @@ interface AuthContextType {
     refreshToken: string | null;
     loading: boolean;
     isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    triggerRotation: (refreshToken: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(
@@ -83,13 +84,23 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
 
     const logout = async (): Promise<void> => {
         await SecureStore.deleteItemAsync("accessToken");
-        await SecureStore.deleteItemAsync("refreshToken");        
+        await SecureStore.deleteItemAsync("refreshToken");
         await SecureStore.deleteItemAsync("user");
 
         setAccessToken(null);
         setRefreshToken(null);
         setUser(null);
     };
+
+    const triggerRotation = async(token: string): Promise<void> => {
+        const data = await rotateToken(token);
+
+        setAccessToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
+
+        await SecureStore.setItemAsync("refreshToken", data.refreshToken);
+        await SecureStore.setItemAsync("accessToken", data.accessToken);
+    }
 
     const isAuthenticated = !!accessToken && !!refreshToken && !!user;
 
@@ -103,6 +114,7 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
                 isAuthenticated,
                 login,
                 logout,
+                triggerRotation
             }}
         >
             {children}
