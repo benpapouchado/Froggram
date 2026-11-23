@@ -77,8 +77,3 @@ public class RefreshTokenService {
     }
 
 }
-
-// curl -i -X POST http://localhost:8080/token/refresh -H "Content-Type:
-// application/json" -d '{
-// "refreshToken": "IamdDbQsLhXzuN8jG0P_eqSTuW_GzJ-_bkzqHRkdXKq_im4c3rJxauo4dAIhjJamrsOteAjP_qSHognrMkFF2Q"
-// }'
