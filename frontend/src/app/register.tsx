@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useRouter } from 'expo-router';
 import { register } from "../auth/sign-in-service";
+import CustomDatePicker from './Date/CustomDatePicker';
 
 
 export default function Register() {
@@ -32,6 +33,7 @@ export default function Register() {
             setError(err.message || "Login failed");
         } finally {
             setLoading(false);
+            // router.navigate('../loggedin/profile');
         }
     };
 
@@ -64,6 +66,12 @@ export default function Register() {
                     onChangeText={setBio}
                 />
 
+                <CustomDatePicker
+                    date={dateOfBirth}
+                    onDateChange={(selectedDate) => {
+                        setDateOfBirth(selectedDate);
+                    }}
+                />
                 {error ? (
                     <Text style={styles.error}>{error}</Text>
                 ) : null}
