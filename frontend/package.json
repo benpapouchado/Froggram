@@ -5,6 +5,9 @@
   "dependencies": {
     "@expo/ui": "~58.0.27",
     "@react-native-community/datetimepicker": "^9.3.0",
+    "@react-navigation/bottom-tabs": "^5.11.15",
+    "@react-navigation/drawer": "^5.12.9",
+    "@react-navigation/stack": "^5.14.9",
     "expo": "~58.0.23",
     "expo-asset": "~58.0.21",
     "expo-constants": "~58.0.15",

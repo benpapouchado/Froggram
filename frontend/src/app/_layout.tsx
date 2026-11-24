@@ -19,9 +19,19 @@ function RootNavigator() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: true }}>
       <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen name="loggedin" />
+        <Stack.Screen name="loggedin"
+          options={{
+            title: 'FROGGRAM',
+            headerStyle: {
+              backgroundColor: '#6772f1',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
       </Stack.Protected>
 
       <Stack.Protected guard={!isAuthenticated}>

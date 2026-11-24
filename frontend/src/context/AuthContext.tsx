@@ -22,6 +22,14 @@ interface LoginResponse {
     refreshToken: string;
 }
 
+type ThemeMode = 'light' | 'dark';
+
+interface ThemeType {
+    theme: ThemeMode;
+    toggleTheme: () => void;
+    setTheme: (theme: ThemeMode) => void;
+}
+
 interface AuthContextType {
     user: User | null;
     accessToken: string | null;
@@ -31,6 +39,7 @@ interface AuthContextType {
     login: (username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     triggerRotation: (refreshToken: string) => Promise<void>;
+    theme: ThemeType;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(
@@ -44,6 +53,12 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+
+    const [theme, setTheme] = useState<ThemeMode>('dark');
+
+    const toggleTheme = () => {
+        setTheme(current => current === 'dark' ? 'light' : 'dark');
+    };
 
     useEffect(() => {
         const restoreSession = async () => {
@@ -92,7 +107,7 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
         setUser(null);
     };
 
-    const triggerRotation = async(token: string): Promise<void> => {
+    const triggerRotation = async (token: string): Promise<void> => {
         const data = await rotateToken(token);
 
         setAccessToken(data.accessToken);
@@ -114,7 +129,8 @@ export const AuthProvider = ({ children, }: AuthProviderProps) => {
                 isAuthenticated,
                 login,
                 logout,
-                triggerRotation
+                triggerRotation,
+                theme: { theme, toggleTheme, setTheme }
             }}
         >
             {children}
