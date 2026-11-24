@@ -70,8 +70,6 @@ export async function register(
     const formattedDate =
         `${dateOfBirth.getFullYear()}-${String(dateOfBirth.getMonth() + 1).padStart(2, '0')}-${String(dateOfBirth.getDate()).padStart(2, '0')}`;
 
-        console.log(password);
-
     const response = await fetch(`${API_URL}/api/user/create`, {
         method: "POST",
         headers: {

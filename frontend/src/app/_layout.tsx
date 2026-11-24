@@ -3,7 +3,7 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
-SplashScreen.preventAutoHideAsync().catch(() => {});
+SplashScreen.preventAutoHideAsync().catch(() => { });
 
 function RootNavigator() {
   const { isAuthenticated, loading } = useAuth();
@@ -26,6 +26,7 @@ function RootNavigator() {
 
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen name="sign-in" />
+        <Stack.Screen name="register" />
       </Stack.Protected>
     </Stack>
   );

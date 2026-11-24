@@ -12,7 +12,6 @@ import { Stack, useRouter } from 'expo-router';
 import { register } from "../auth/sign-in-service";
 import CustomDatePicker from './Date/CustomDatePicker';
 
-
 export default function Register() {
 
     const [username, setUsername] = useState("");
@@ -23,7 +22,6 @@ export default function Register() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-
     const handleRegister = async () => {
         try {
             setError("");
@@ -33,7 +31,9 @@ export default function Register() {
             setError(err.message || "Login failed");
         } finally {
             setLoading(false);
-            // router.navigate('../loggedin/profile');
+            if(error === ""){
+                router.push('../sign-in');
+            }
         }
     };
 
