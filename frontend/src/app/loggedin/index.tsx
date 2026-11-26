@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Profile from './tabs/profile';
+import Upload from './tabs/upload';
 
 function FeedScreen() {
     return (
@@ -50,7 +51,7 @@ export default function HomeScreen() {
         >
             <Tab.Screen name="Home" component={FeedScreen} />
             <Tab.Screen name="Explore" component={ExploreScreen} />
-            <Tab.Screen name="Upload" component={ActivityScreen} />
+            <Tab.Screen name="Upload" component={Upload} />
             <Tab.Screen name="Activity" component={UploadScreen} />
             <Tab.Screen name="Profile" component={Profile} />
         </Tab.Navigator>
