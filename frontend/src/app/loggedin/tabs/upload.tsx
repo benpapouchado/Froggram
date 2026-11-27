@@ -7,6 +7,11 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { fetchPreSignedUrl } from '../post/post';
+import { useAuth } from "../../../context/AuthContext";
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 
 export default function ImageSelect() {
     const [image, setImage] = useState<string | null>(null);
@@ -57,10 +62,33 @@ export default function ImageSelect() {
         }
     };
 
+        const [url, setUrl] = useState<string | null>(null);
+        const [error, setError] = useState("");
+        const { user } = useAuth();
+
+        const upload = async () => {
+            try {
+                setError("");
+
+                const username = user?.username;
+                if (!username) {
+                    throw new Error("Username is unavailable");
+                }
+                const uri = await fetchPreSignedUrl(username);
+                setUrl(uri);
+                console.log(uri);
+            } catch (err: any) {
+                setError(err.message || "fetch url failed");
+            } finally {
+                console.log("beep",user?.username, url);
+            }
+        };
+
     return (
         <View style={imageSelect.container}>
             <Button title="Photo Library" onPress={pickImage} />
             <Button title="Take a photo" onPress={takePhoto} />
+            <Button title="Upload" onPress={upload} />
             {image && <Image source={{ uri: image }} style={imageSelect.image} />}
         </View>
     );

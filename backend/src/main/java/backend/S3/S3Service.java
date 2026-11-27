@@ -20,7 +20,7 @@ public class S3Service {
         this.bucketName = System.getenv("S3_BUCKET_NAME");
     }
 
-    public String generateUrl(String userId, HttpMethod httpMethod) {
+    public String generateUrl(String username, HttpMethod httpMethod) {
 
         Date expiration = new Date(
             System.currentTimeMillis() + 5 * 60 * 1000
@@ -30,7 +30,7 @@ public class S3Service {
 
         try {
             GeneratePresignedUrlRequest request =
-                new GeneratePresignedUrlRequest(bucketName, userId)
+                new GeneratePresignedUrlRequest(bucketName, username)
                     .withMethod(httpMethod)
                     .withExpiration(expiration);
 

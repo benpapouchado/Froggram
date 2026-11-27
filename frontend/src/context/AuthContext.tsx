@@ -16,12 +16,6 @@ export interface User {
     username: string;
 }
 
-interface LoginResponse {
-    user: User;
-    accessToken: string;
-    refreshToken: string;
-}
-
 type ThemeMode = 'light' | 'dark';
 
 interface ThemeType {
