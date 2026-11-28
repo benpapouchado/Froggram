@@ -18,11 +18,6 @@ public class PhotoController {
         this.s3Service = s3Service;
     }
 
-    // public record S3PreSignedUrlDto(
-    //         String userId,
-    //         String accessToken) {
-    // }
-
     @PostMapping("/generate-pre-signed-url")
     public ResponseEntity<String> generatePreSignedUrl(@RequestBody String username) {
         String url = s3Service.generateUrl(username, HttpMethod.POST);

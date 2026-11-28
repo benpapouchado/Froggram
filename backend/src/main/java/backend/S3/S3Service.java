@@ -4,6 +4,7 @@ package backend.S3;
 import java.util.Date;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
@@ -13,11 +14,10 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 public class S3Service {
 
     private final S3Client s3client;
-    private final String bucketName;
+    @Value("${s3.bucket.name}") String bucketName;
 
     public S3Service(S3Client s3client) {
         this.s3client = s3client;
-        this.bucketName = System.getenv("S3_BUCKET_NAME");
     }
 
     public String generateUrl(String username, HttpMethod httpMethod) {
